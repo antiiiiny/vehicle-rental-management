@@ -10,6 +10,7 @@ const branchRoutes = require('./routes/branchRoutes');
 const vehicleRoutes = require('./routes/vehicleRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const inspectionRoutes = require('./routes/inspectionRoutes');
+const reportRoutes = require('./routes/reportRoutes');
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use('/api/branches', branchRoutes);
 app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/inspections', inspectionRoutes);
+app.use('/api/reports', reportRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

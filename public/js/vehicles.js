@@ -52,36 +52,38 @@ document.getElementById('form-search').addEventListener('submit', async (e) => {
   e.preventDefault();
   const msg = document.getElementById('search-msg');
   const table = document.getElementById('search-results');
+  const wrapper = document.getElementById('search-results-wrapper');
   msg.textContent = '';
   msg.className = 'msg';
   const form = new FormData(e.target);
   const params = new URLSearchParams(
-    Object.fromEntries([...form.entries()].filter(([, v]) => v !== ''))
+    Object.fromEntries([...form.entries()].filter(([k, v]) => v !== '' && k !== 'addons'))
   );
   try {
     const data = await apiFetch(`/vehicles/available?${params.toString()}`);
     const tbody = table.querySelector('tbody');
     tbody.innerHTML = '';
     if (data.vehicles.length === 0) {
-      msg.textContent = 'No vehicles available for that search.';
-      table.hidden = true;
+      msg.textContent = 'No vehicles available for that search criteria.';
+      if (wrapper) wrapper.hidden = true;
       return;
     }
     data.vehicles.forEach((v) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${v.model}</td>
-        <td>${v.type}</td>
+        <td><span class="tag">${v.type}</span></td>
         <td>${v.branchId ? `${v.branchId.name} (${v.branchId.city})` : '-'}</td>
-        <td>${v.perDayRate}</td>
+        <td>$${v.perDayRate.toFixed(2)}</td>
+        <td><button class="btn small" onclick="handleBookVehicle('${v._id}')">Book Now</button></td>
       `;
       tbody.appendChild(tr);
     });
-    table.hidden = false;
+    if (wrapper) wrapper.hidden = false;
   } catch (err) {
     msg.textContent = err.message;
     msg.classList.add('error');
-    table.hidden = true;
+    if (wrapper) wrapper.hidden = true;
   }
 });
 

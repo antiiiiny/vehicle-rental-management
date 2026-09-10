@@ -69,6 +69,29 @@ const bookingSchema = new mongoose.Schema(
     cancelledAt: {
       type: Date,
     },
+    cancellationFee: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    refundAmount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    addons: [
+      {
+        addonId: { type: String, required: true },
+        name: { type: String, required: true },
+        ratePerDay: { type: Number, required: true, min: 0 },
+        totalAmount: { type: Number, required: true, min: 0 },
+      },
+    ],
+    addonsTotal: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
   { timestamps: true }
 );

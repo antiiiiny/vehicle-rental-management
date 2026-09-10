@@ -60,20 +60,27 @@ This is the graded "backbone" — checked first in the demo. Everything in Stage
 
 ## Stage 3 — Reporting & Access
 **Owner: M3**
+**Status: ✅ Done**
 **Depends on:** Stage 1 (`vehicles`) for pricing/add-ons; Stage 2 (`bookings`) for history, cancellation, and reports
 
-- Pricing & Add-On Management (base rate + insurance/driver/GPS) — can start as soon as `vehicles` exists, doesn't need to wait for all of Stage 2
-- Cancellation Policy Engine (time-based charges before pickup) — needs `bookings` status field from Stage 2
-- Customer Rental History — needs `bookings`
-- Branch Fleet Utilization Reports (utilization rate, revenue) — needs `bookings` + `vehicles`
-- Role-Based Access Control — should be threaded into routes as they're built in every stage, not bolted on at the end; M3 owns writing `middleware/rbac.js` early so M1/M2 can apply it as they go
+- **Pricing & Add-On Management** (`/api/reports/addons` & `/api/bookings`):
+  - Catalog of add-ons (`insurance`, `driver`, `gps`, `child_seat`) with daily rates.
+  - Add-ons integrated into booking creation (`addons` array & `addonsTotal` calculation).
+- **Cancellation Policy Engine** (`/api/bookings/:id/cancellation-quote` & `/api/bookings/:id/cancel`):
+  - Time-tiered cancellation fees before pickup (`≥48h`: 0% fee/100% refund, `24-48h`: 20% fee/80% refund, `<24h`: 50% fee/50% refund).
+- **Customer Rental History** (`/api/reports/customer-history`):
+  - Detailed rental history with summary metrics (`totalBookings`, `completedBookings`, `activeBookings`, `cancelledBookings`, `totalSpent`).
+- **Branch Fleet Utilization & Revenue Reports** (`/api/reports/utilization` & `/api/reports/financials`):
+  - Real-time fleet status metrics, active trip count, utilization rate %, popular vehicle models, and financial breakdown (base revenue, add-ons, damage fees, late fees, cancellation fees, net revenue).
+- **Role-Based Access Control** (`middleware/auth.js`, `middleware/rbac.js`):
+  - Applied across all report routes and booking endpoints.
 
 ## Stage 4 — Integration
 **All members**
+**Status: ✅ Done**
 
-- Walk the full end-to-end flow together: register → search → book → pickup → return → report
-- Fix cross-module bugs surfaced by the integration pass (this is where role-check gaps and status-transition bugs usually show up)
-- Confirm every route in the Postman checklist behaves correctly end to end, not just in isolation
+- **Full End-to-End Flow Integration**: Single-page web UI (`public/index.html`, `public/js/`, `public/css/style.css`) supporting Register/Login, Vehicle Availability Search with Add-ons, Booking creation, Customer Rental History with Cancellation Quote modal, Pickup/Return Inspection UI, and Admin Reports & Fleet Analytics Dashboard.
+- **Cross-Module Verification**: Verified pricing calculations, date overlap conflict checks, status transition validations (`reserved` → `picked_up` → `returned` / `cancelled`), damage/late fee adjustments, and RBAC endpoint protections.
 
 ## Stage 5 — Docs & Submission
 **Owner: M4, reviewed by all**

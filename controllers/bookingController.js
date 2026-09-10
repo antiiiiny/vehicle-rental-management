@@ -2,10 +2,12 @@ const Booking = require('../models/Booking');
 const Vehicle = require('../models/Vehicle');
 const Inspection = require('../models/Inspection');
 const { ApiError } = require('../middleware/errorHandler');
+const { calculateAddonsTotal } = require('../utils/pricingConfig');
+const { calculateCancellationDetails } = require('../utils/cancellationPolicy');
 
 async function createBooking(req, res, next) {
   try {
-    const { vehicleId, startDate, endDate, customerId: requestedCustomerId } = req.body;
+    const { vehicleId, startDate, endDate, customerId: requestedCustomerId, addons = [] } = req.body;
 
     // Determine customer ID (customer role is locked to their own ID)
     let customerId = req.user.id;
@@ -54,7 +56,10 @@ async function createBooking(req, res, next) {
     const diffTime = end.getTime() - start.getTime();
     const totalDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
     const baseRate = vehicle.perDayRate;
-    const totalAmount = totalDays * baseRate;
+
+    // Calculate add-on charges
+    const { addonsList, addonsTotal } = calculateAddonsTotal(addons, totalDays);
+    const totalAmount = (totalDays * baseRate) + addonsTotal;
 
     const booking = await Booking.create({
       vehicleId,
@@ -63,6 +68,8 @@ async function createBooking(req, res, next) {
       endDate: end,
       baseRate,
       totalDays,
+      addons: addonsList,
+      addonsTotal,
       totalAmount,
       finalAmount: totalAmount,
       status: 'reserved',
@@ -162,6 +169,34 @@ async function getBooking(req, res, next) {
   }
 }
 
+async function getCancellationQuote(req, res, next) {
+  try {
+    const booking = await Booking.findById(req.params.id);
+
+    if (!booking) {
+      throw new ApiError(404, 'Booking not found', 'NOT_FOUND');
+    }
+
+    if (req.user.role === 'customer' && booking.customerId.toString() !== req.user.id) {
+      throw new ApiError(403, 'You do not have permission to access this cancellation quote', 'FORBIDDEN');
+    }
+
+    const quote = calculateCancellationDetails(booking);
+
+    res.json({
+      success: true,
+      message: 'Cancellation quote generated',
+      data: {
+        bookingId: booking._id,
+        currentStatus: booking.status,
+        quote,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function cancelBooking(req, res, next) {
   try {
     const booking = await Booking.findById(req.params.id);
@@ -183,15 +218,22 @@ async function cancelBooking(req, res, next) {
       );
     }
 
+    const cancellationDetails = calculateCancellationDetails(booking);
+
     booking.status = 'cancelled';
     booking.cancellationReason = req.body.reason || 'Cancelled by user';
     booking.cancelledAt = new Date();
+    booking.cancellationFee = cancellationDetails.cancellationFee;
+    booking.refundAmount = cancellationDetails.refundAmount;
     await booking.save();
 
     res.json({
       success: true,
       message: 'Booking cancelled successfully',
-      data: { booking },
+      data: {
+        booking,
+        cancellationDetails,
+      },
     });
   } catch (err) {
     next(err);
@@ -230,8 +272,11 @@ async function updateBookingStatus(req, res, next) {
 
     booking.status = status;
     if (status === 'cancelled') {
+      const cancellationDetails = calculateCancellationDetails(booking);
       booking.cancelledAt = new Date();
       booking.cancellationReason = req.body.reason || 'Cancelled by staff/admin';
+      booking.cancellationFee = cancellationDetails.cancellationFee;
+      booking.refundAmount = cancellationDetails.refundAmount;
     }
     await booking.save();
 
@@ -249,6 +294,7 @@ module.exports = {
   createBooking,
   listBookings,
   getBooking,
+  getCancellationQuote,
   cancelBooking,
   updateBookingStatus,
 };

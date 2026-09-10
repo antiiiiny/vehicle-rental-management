@@ -7,6 +7,7 @@ const {
   createBooking,
   listBookings,
   getBooking,
+  getCancellationQuote,
   cancelBooking,
   updateBookingStatus,
 } = require('../controllers/bookingController');
@@ -28,6 +29,7 @@ const statusValidators = [
 router.post('/', verifyToken, createBookingValidators, validate, createBooking);
 router.get('/', verifyToken, listBookings);
 router.get('/:id', verifyToken, getBooking);
+router.get('/:id/cancellation-quote', verifyToken, getCancellationQuote);
 router.patch('/:id/cancel', verifyToken, cancelBooking);
 router.patch(
   '/:id/status',

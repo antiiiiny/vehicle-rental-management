@@ -97,6 +97,8 @@ Every member must still be able to explain modules outside their own area in the
 
 See `stages.md` for the stage-wise build order and what unlocks what between members.
 
+**After finishing a stage, update `stages.md`:** mark it `✅ Done`, list what was actually built (models, endpoints, middleware), and note anything from that stage deliberately left for later. Keeps the doc a reliable status check instead of just a plan, for teammates and in the viva.
+
 ## Postman Testing Checklist (must cover before demo)
 
 - Happy path CRUD on the core resource

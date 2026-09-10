@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vehicle Rental Management</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <header>
+    <h1>Vehicle Rental Management</h1>
+    <nav>
+      <span id="user-status">Not logged in</span>
+      <button id="nav-search">Search</button>
+      <button id="nav-account">Account</button>
+      <button id="nav-admin">Admin</button>
+      <button id="nav-logout" hidden>Logout</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Account: register / login -->
+    <section class="panel" id="panel-account">
+      <h2>Register</h2>
+      <form id="form-register">
+        <div class="field"><label>Name</label><input name="name" required /></div>
+        <div class="field"><label>Email</label><input name="email" type="email" required /></div>
+        <div class="field"><label>Password</label><input name="password" type="password" required minlength="6" /></div>
+        <div class="field">
+          <label>Role</label>
+          <select name="role">
+            <option value="customer">Customer</option>
+            <option value="branch_staff">Branch Staff</option>
+          </select>
+        </div>
+        <button type="submit">Register</button>
+      </form>
+      <div class="msg" id="register-msg"></div>
+
+      <h2>Login</h2>
+      <form id="form-login">
+        <div class="field"><label>Email</label><input name="email" type="email" required /></div>
+        <div class="field"><label>Password</label><input name="password" type="password" required /></div>
+        <button type="submit">Login</button>
+      </form>
+      <div class="msg" id="login-msg"></div>
+    </section>
+
+    <!-- Search: availability search -->
+    <section class="panel" id="panel-search" hidden>
+      <h2>Search Available Vehicles</h2>
+      <form id="form-search">
+        <div class="field">
+          <label>Branch</label>
+          <select name="branchId" id="search-branch"><option value="">Any</option></select>
+        </div>
+        <div class="field">
+          <label>Type</label>
+          <select name="type">
+            <option value="">Any</option>
+            <option value="car">Car</option>
+            <option value="bike">Bike</option>
+          </select>
+        </div>
+        <div class="field"><label>Start date</label><input name="startDate" type="date" required /></div>
+        <div class="field"><label>End date</label><input name="endDate" type="date" required /></div>
+        <button type="submit">Search</button>
+      </form>
+      <div class="msg" id="search-msg"></div>
+      <table id="search-results" hidden>
+        <thead><tr><th>Model</th><th>Type</th><th>Branch</th><th>Rate/day</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- Admin: manage branches and vehicles -->
+    <section class="panel" id="panel-admin" hidden>
+      <h2>Add Branch</h2>
+      <form id="form-branch">
+        <div class="field"><label>Name</label><input name="name" required /></div>
+        <div class="field"><label>City</label><input name="city" required /></div>
+        <button type="submit">Add Branch</button>
+      </form>
+      <div class="msg" id="branch-msg"></div>
+
+      <h2>Add Vehicle</h2>
+      <form id="form-vehicle">
+        <div class="field">
+          <label>Branch</label>
+          <select name="branchId" id="vehicle-branch" required></select>
+        </div>
+        <div class="field">
+          <label>Type</label>
+          <select name="type">
+            <option value="car">Car</option>
+            <option value="bike">Bike</option>
+          </select>
+        </div>
+        <div class="field"><label>Model</label><input name="model" required /></div>
+        <div class="field"><label>Rate/day</label><input name="perDayRate" type="number" min="0" step="0.01" required /></div>
+        <button type="submit">Add Vehicle</button>
+      </form>
+      <div class="msg" id="vehicle-msg"></div>
+
+      <h2>Fleet</h2>
+      <table id="fleet-table">
+        <thead><tr><th>Model</th><th>Type</th><th>Branch</th><th>Rate/day</th><th>Status</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/vehicles.js"></script>
+</body>
+</html>

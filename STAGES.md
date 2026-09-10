@@ -4,26 +4,33 @@ Stage-wise build order. Stages are about **dependency order**, not a calendar �
 
 ## Stage 0 — Repo & Infra Foundation
 **Owner: M4**
+**Status: ✅ Done**
 
 - Repo skeleton: `config/`, `models/`, `routes/`, `controllers/`, `middleware/`, `utils/`
 - `.env.example` + `.gitignore` (`.env`, `node_modules/`)
 - `config/db.js` — MongoDB connection
 - `middleware/errorHandler.js` — centralized error handler, consistent JSON shape
-- `middleware/validate.js` — validation wrapper (express-validator/Joi)
+- `middleware/validate.js` — validation wrapper (express-validator)
 - Base `server.js` wiring it all together
 
 Everyone else branches off this once it's pushed. Nothing downstream should be blocked waiting on infra beyond this point.
 
 ## Stage 1 — Foundation
 **Owner: M1**
+**Status: ✅ Done**
 
-- `users` and `branches` and `vehicles` models
-- User Registration & Authentication (JWT issue/verify, bcrypt hashing)
-- Branch Management (admin CRUD)
-- Vehicle Master & Fleet Management (CRUD: type, model, per-day rate)
-- Availability Search Engine (search by branch + date range)
+- `users`, `branches`, `vehicles` models, plus a minimal `bookings` stub (`vehicleId`, `customerId`, `startDate`, `endDate`, `status`) needed only to support the availability overlap check — full booking CRUD is still Stage 2
+- User Registration & Authentication (JWT issue/verify, bcrypt hashing) — `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`
+- Branch Management (admin CRUD, public read) — `/api/branches`
+- Vehicle Master & Fleet Management (CRUD: type, model, per-day rate; admin write, public read) — `/api/vehicles`
+- Availability Search Engine (search by branch + date range, excludes vehicles with an overlapping `reserved`/`picked_up` booking) — `GET /api/vehicles/available`
+- `middleware/auth.js` (JWT verify) and `middleware/rbac.js` (`requireRole`) written and applied to every admin-only write route
+- Minimal HTML/JS frontend (`public/`) for register/login, availability search, and admin branch/vehicle management
+- Verified end-to-end against a live MongoDB Atlas cluster: registration/login issue valid JWTs, admin routes reject wrong-role (403) and missing-token (401) requests, and the overlap query correctly excludes/includes a vehicle depending on date range
 
 This is the graded "backbone" — checked first in the demo. Everything in Stage 2 depends on `vehicles` and `branches` existing.
+
+**Not yet built (left for Stage 2+):** booking creation/workflow endpoints, inspections, pricing/add-ons, cancellation, reporting, Postman collection.
 
 ## Stage 2 — Core Workflow
 **Owner: M2**

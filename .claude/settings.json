@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -m 5 -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5000/api/branches)",
+      "Bash(echo \"exit:$?\")",
+      "Bash(node \"C:\\\\Users\\\\anton\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Antony-Christ-uni-3rd-year-L-T-vehicle-rental-management\\\\748eec2b-f7b7-40b7-a2ab-382ce9af9c28\\\\scratchpad\\\\promote.js\" .env ./models/User.js)",
+      "Bash(node _smoketest_promote.js)",
+      "Bash(node _smoketest_booking.js)",
+      "Bash(curl -s 'http://localhost:5000/api/vehicles/available?startDate=2026-10-01&endDate=2026-10-05')",
+      "Bash(curl -s 'http://localhost:5000/api/vehicles/available?startDate=2026-10-05&endDate=2026-10-07')",
+      "Bash(node _smoketest_cleanup.js)",
+      "Bash(rm -f _smoketest_promote.js _smoketest_booking.js _smoketest_cleanup.js)"
+    ]
+  }
+}

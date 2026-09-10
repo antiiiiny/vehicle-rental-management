@@ -84,9 +84,13 @@ This is the graded "backbone" — checked first in the demo. Everything in Stage
 
 ## Stage 5 — Docs & Submission
 **Owner: M4, reviewed by all**
+**Status: ✅ Done**
 
-- Postman collection (exported `.json`) covering every implemented endpoint
-- README: setup instructions, module list mapped to requirements, API reference, schema summary with ref/embed reasoning, known limitations
-- PDF report: Team Details page first, GitHub link, project overview, module summary (min 7 pages)
-- PPT: problem statement, objectives, architecture, ER/collection diagram, sample API demo, learnings/challenges
+- Postman collection (`docs/submission/vehicle-rental-management.postman_collection.json`) covering all 28 implemented endpoints
+- README with setup instructions, module-to-requirement mapping, API reference, schema summary, reference/embed reasoning, and known limitations
+- Nine-page PDF report (`docs/submission/vehicle-rental-management-report.pdf`) with Team Details first and GitHub link
+- Ten-slide PPT (`docs/submission/vehicle-rental-management-presentation.pptx`) covering problem statement, objectives, architecture, collection relationships, API demo, learnings, challenges, and viva walkthrough
+- Editable report and presentation outlines plus reproducible generator in `docs/`
+
+**Deliberately left for final team editing:** replace the Team Details placeholders with member names and registration numbers before submission.
 - Every member does a quick walkthrough of the modules they didn't personally build, so everyone can handle viva questions on any part of the project

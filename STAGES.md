@@ -34,13 +34,29 @@ This is the graded "backbone" — checked first in the demo. Everything in Stage
 
 ## Stage 2 — Core Workflow
 **Owner: M2**
+**Status: ✅ Done**
 **Depends on:** Stage 1 (`vehicles`, `branches`, `users` models)
 
-- `bookings` and `inspections` models
-- Booking Workflow — date-range conflict validation (no double-booking a vehicle)
-- Pickup Inspection Module (odometer, fuel level, condition notes)
-- Return Inspection & Damage Charges (compute extra charges)
-- Booking Status Management (Reserved → Picked-up → Returned → Cancelled)
+- `Booking` and `Inspection` Mongoose models with strict schema definitions, compound indexes (`{ vehicleId: 1, startDate: 1, endDate: 1 }`, `{ bookingId: 1, stage: 1 }`), and automatic financial summary calculations.
+- **Booking Workflow & Conflict Validation** (`/api/bookings`):
+  - `POST /api/bookings` — creates booking after validating ISO date ranges, vehicle availability status, and executing date-range overlap conflict queries (`$lt`/`$gt` overlap checks). Calculates `totalDays` and `totalAmount` based on `perDayRate`.
+  - `GET /api/bookings` — list bookings with role-based scoping (customers only see own bookings; branch staff/admin see all with branch/vehicle filters).
+  - `GET /api/bookings/:id` — fetch booking details with populated vehicle, customer, branch, and associated pickup/return inspections.
+  - `PATCH /api/bookings/:id/cancel` — allows customer to cancel own reserved booking or admin/staff to cancel.
+  - `PATCH /api/bookings/:id/status` — admin/staff status management with strict transition validation.
+- **Pickup Inspection Module** (`/api/inspections/pickup`):
+  - `POST /api/inspections/pickup` — records odometer, fuel level, damage notes, inspector ID, and automatically transitions booking status from `reserved` to `picked_up`. Prevents duplicate pickup inspections.
+- **Return Inspection & Extra Charges** (`/api/inspections/return`):
+  - `POST /api/inspections/return` — records return inspection, validates return odometer >= pickup odometer, computes `damageFee`, `fuelCharges`, `lateFee`, calculates `finalAmount`, and transitions booking status from `picked_up` to `returned`.
+- **Inspection Retrieval Endpoints**:
+  - `GET /api/inspections/booking/:bookingId` — get all inspections for a booking (with customer access check).
+  - `GET /api/inspections/:id` — get individual inspection details.
+- **Middleware & RBAC Integration**:
+  - Validated with `express-validator` on all input bodies.
+  - Protected with `auth.js` (`verifyToken`) and `rbac.js` (`requireRole('branch_staff', 'admin')`).
+  - Standardized error handling returning clean `{ success: false, message, errorCode }` and `{ success: true, message, data }`.
+
+**Not yet built (left for Stage 3+):** pricing add-ons (insurance/driver/GPS), cancellation refund policy calculations, rental history reporting, fleet utilization reports, Postman export.
 
 ## Stage 3 — Reporting & Access
 **Owner: M3**
